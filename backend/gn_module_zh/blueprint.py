@@ -1003,3 +1003,45 @@ def get_hierarchy(id_zh):
 @json_resp
 def get_hierarchy_fields(id_rb):
     return get_all_hierarchy_fields(id_rb=id_rb)
+
+@blueprint.route("/all/hierarchy", methods=["GET"])
+@permissions.check_cruved_scope("C", module_code="ZONES_HUMIDES")
+@json_resp
+def generate_all_notes():
+    query_no_notes = """
+        select distinct(tzh.id_zh)
+        from pr_zh.t_zh tzh
+        join pr_zh.cor_zh_rb czr on czr.id_zh = tzh.id_zh
+        -- selectionner uniquement les zh avec des bassins versants qui ont des règles de hiérarchisation :
+        where czr.id_rb in (
+            select distinct(rb_id)
+            from pr_zh.cor_rb_rules crb
+            )
+        -- et qui n'ont pas de notes :
+        and tzh.id_zh not in (
+            select distinct(id_zh)
+            from pr_zh.cor_zh_notes
+            )
+        -- et qui ont une valeur sdage valide pour le bassin versant auquel elle appartient :
+        and tzh.id_sdage in (
+            select distinct(ti.attribute_id)
+            from pr_zh.cor_rb_rules crb
+            left join pr_zh.t_items ti on ti.cor_rule_id=crb.cor_rule_id 
+            where crb.rule_id = 1
+            and crb.rb_id = czr.id_rb 
+            )
+        order by tzh.id_zh asc;
+    """
+    result = DB.session.scalars(text(query_no_notes)).all()
+    for id_zh in result:
+        try:
+            print(id_zh)
+            get_hierarchy(id_zh)
+        except Exception as e:
+            # quand 1 zh intersecte 2 ou plus bassin versants et que l'un d'eux n'a pas de règle de hiérarchisation
+            print(e)
+            if e == 'no_rb_rules':
+                print(e)
+                pass
+    return result
+    
