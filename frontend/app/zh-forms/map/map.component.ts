@@ -15,6 +15,7 @@ export class ZhFormMapComponent implements OnInit, AfterViewInit {
   @Output() draw = new EventEmitter<any>();
   @Output() edit = new EventEmitter<any>();
   @Output() endDraw = new EventEmitter<any>();
+  @Output() delete = new EventEmitter<any>();
 
   constructor(private _mapService: MapService) {}
 
@@ -38,8 +39,6 @@ export class ZhFormMapComponent implements OnInit, AfterViewInit {
         this._mapService.currentExtend.zoom
       );
     }
-    console.log(L.Draw);
-
     this._mapService.map.off(L.Draw.Event.DRAWSTART);
     this._mapService.map.on(L.Draw.Event.CREATED, (e) => {
       this.onDrawStop(e);
@@ -49,6 +48,9 @@ export class ZhFormMapComponent implements OnInit, AfterViewInit {
       this.onBeginEdit(e);
     });
     this._mapService.map.on(L.Draw.Event.EDITED, (e) => {
+      this.onEdit(e);
+    });
+    this._mapService.map.on(L.Draw.Event.DELETED, (e) => {
       this.onEdit(e);
     });
   }
@@ -67,5 +69,9 @@ export class ZhFormMapComponent implements OnInit, AfterViewInit {
 
   onDrawStop(e) {
     this.endDraw.emit(e);
+  }
+
+  onDeleted(e) {
+    this.delete.emit(e);
   }
 }

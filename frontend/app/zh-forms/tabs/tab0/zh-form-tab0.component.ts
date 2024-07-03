@@ -13,6 +13,8 @@ import { PbfService } from '../../../services/pbf.service';
 
 const GEOM_CONTAINED_ID = 1;
 
+const EMPTY_GEOMETRY = { geojson: null };
+
 @Component({
   selector: 'zh-form-tab0',
   templateUrl: './zh-form-tab0.component.html',
@@ -31,7 +33,7 @@ export class ZhFormTab0Component implements OnInit {
   public idOrg: any;
   public $_geojsonSub: Subscription;
   public $_currentZhSub: Subscription;
-  private geometry: any;
+  private geometry: any = EMPTY_GEOMETRY;
   private currentLayer: any;
   public submitted = false;
   public posted = false;
@@ -81,6 +83,9 @@ export class ZhFormTab0Component implements OnInit {
         }
       });
     this._pbfService.setPaneBackground(this._mapService.map);
+  }
+  get isGeometryDefined(): boolean {
+    return this.geometry && this.geometry != EMPTY_GEOMETRY;
   }
 
   intiTab() {
@@ -254,6 +259,7 @@ export class ZhFormTab0Component implements OnInit {
   updateGeom(newGeometry: any) {
     this.canChangeTab.emit(false);
     this.geometry = newGeometry;
+    console.log(newGeometry);
   }
 
   onCancel() {

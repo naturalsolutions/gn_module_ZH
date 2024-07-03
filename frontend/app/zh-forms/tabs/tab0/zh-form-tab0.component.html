@@ -5,6 +5,7 @@
         (draw)="updateGeom($event)"
         (endDraw)="onNewGeom($event)"
         (edit)="updateGeom($event)"
+        (delete)="updateGeom(null)"
       ></zh-form-map>
     </div>
     <div class="col-xl-6 col-lg-5 col-sm-6">
@@ -116,7 +117,7 @@
           mat-raised-button
           color="primary"
           class="ml-3"
-          [disabled]="posted"
+          [disabled]="posted || form.invalid || !isGeometryDefined"
           (click)="onFormSubmit(form.value)"
         >
           <mat-icon *ngIf="!posted">save_outline</mat-icon>
