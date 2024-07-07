@@ -26,9 +26,9 @@ export class ZhFormTab3Component implements OnInit {
   public currentZh: any;
   corinBioMetaData: any;
   corinTableCol = [
-    { name: 'corinBio', label: 'Code Corine biotopes', subcell: { name: 'CB_code' }},
-    { name: 'corinBio', label: 'Libellé Corine biotopes', subcell: { name: 'CB_label' }},
-    { name: 'corinBio', label: 'Humidité', size: '5%', subcell: { name: 'CB_humidity' }},
+    { name: 'corinBio', label: 'Code Corine biotopes', subcell: { name: 'CB_code' } },
+    { name: 'corinBio', label: 'Libellé Corine biotopes', subcell: { name: 'CB_label' } },
+    { name: 'corinBio', label: 'Humidité', size: '5%', subcell: { name: 'CB_humidity' } },
     { name: 'cbCover', label: 'Recouvrement sur la ZH (%)', size: '5%' },
   ];
   // subcell : if the data contain a list inside the data list
@@ -146,10 +146,10 @@ export class ZhFormTab3Component implements OnInit {
           this.currentZh.properties.cb_codes_corine_biotope.forEach((cb) => {
             this.corinBioMetaData.find((item) => {
               if (item.CB_code == cb.lb_code) {
-                this.listCorinBio.push({ "corinBio": item, "cbCover": cb.cb_cover })
+                this.listCorinBio.push({ corinBio: item, cbCover: cb.cb_cover });
               }
-            })
-          })
+            });
+          });
         }
         this.currentZh.properties.activities.forEach((activity) => {
           let impacts = [];
@@ -268,7 +268,7 @@ export class ZhFormTab3Component implements OnInit {
     this.canChangeTab.emit(false);
     this.patchCorinBio = false;
     this.addModalBtnLabel = 'Ajouter';
-    
+
     this.modalTitle = "Ajout d'un habitat Corine Biotopes";
     event.stopPropagation();
     this.ngbModal.open(modal, {
@@ -449,11 +449,10 @@ export class ZhFormTab3Component implements OnInit {
     this.patchCorinBio = false;
     this.formCorinSubmitted = true;
     if (this.corinBioForm.valid) {
-      this.listCorinBio.push(
-        {
-          "corinBio": this.corinBioForm.value.corinBio,
-          "cbCover": this.corinBioForm.value.cbCover
-        });
+      this.listCorinBio.push({
+        corinBio: this.corinBioForm.value.corinBio,
+        cbCover: this.corinBioForm.value.cbCover,
+      });
       this.ngbModal.dismissAll();
       this.corinBioForm.reset();
       this.canChangeTab.emit(false);

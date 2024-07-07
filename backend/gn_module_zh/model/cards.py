@@ -536,9 +536,9 @@ class Presentation:
                     "code": cb["lb_code"],
                     "label": CorineBiotope(cb["lb_code"]).__str__()["label"],
                     "Humidité": CorineBiotope(cb["lb_code"]).__str__()["Humidité"],
-                    "recouvrement": cb["cb_cover"]
-                } 
-                 for cb in self.cb_codes_corine_biotope
+                    "recouvrement": cb["cb_cover"],
+                }
+                for cb in self.cb_codes_corine_biotope
             ],
             "remarques": Utils.get_string(self.remark_pres),
             "ef_area": self.ef_area,
