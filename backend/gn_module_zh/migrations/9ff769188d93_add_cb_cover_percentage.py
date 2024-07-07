@@ -17,7 +17,7 @@ depends_on = None
 
 
 def upgrade():
-    op.add_column(table_name="cor_zh_cb", column=sa.Column("cd_cover", sa.Integer, nullable=True), schema='pr_zh')
+    op.add_column(table_name="cor_zh_cb", column=sa.Column("cb_cover", sa.Integer, nullable=True), schema='pr_zh')
 
 def downgrade():
-    op.drop_column(table_name="cor_zh_cb", column_name="cd_cover", schema='pr_zh')
+    op.drop_column(table_name="cor_zh_cb", column_name="cb_cover", schema='pr_zh')

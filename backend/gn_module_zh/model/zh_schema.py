@@ -639,6 +639,7 @@ class CorZhCb(DB.Model):
     __table_args__ = {"schema": "pr_zh"}
     id_zh = DB.Column(DB.Integer, ForeignKey(TZH.id_zh), primary_key=True)
     lb_code = DB.Column(DB.Integer, ForeignKey(BibCb.lb_code), primary_key=True)
+    cb_cover = DB.Column(DB.Integer, nullable=True)
 
 
 class CorZhCorineCover(DB.Model):
