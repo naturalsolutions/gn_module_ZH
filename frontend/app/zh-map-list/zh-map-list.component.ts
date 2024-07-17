@@ -1,8 +1,9 @@
 import { Component, HostListener, OnInit, OnDestroy, AfterViewInit } from '@angular/core';
-
+import { Router } from '@angular/router';
 import { MapListService } from '@geonature_common/map-list/map-list.service';
 import { MapService } from '@geonature_common/map/map.service';
 import { ConfigService } from '@geonature/services/config.service';
+import { ModuleService } from '@geonature/services/module.service';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import * as moment from 'moment';
 import { ZhDataService } from '../services/zh-data.service';
@@ -49,7 +50,9 @@ export class ZhMapListComponent implements OnInit, OnDestroy, AfterViewInit {
     private _toastr: ToastrService,
     private _error: ErrorTranslatorService,
     public _searchService: SearchFormService,
-    public config: ConfigService
+    public config: ConfigService,
+    private _moduleService: ModuleService,
+    private _router: Router
   ) {}
 
   ngOnInit() {
@@ -213,6 +216,8 @@ export class ZhMapListComponent implements OnInit, OnDestroy, AfterViewInit {
       () => {
         this.mapListService.deleteObsFront(row.id_zh);
         this._commonService.translateToaster('success', 'la zh a été supprimée avec succès');
+        const currentModulePath = this._moduleService.currentModule.module_path.toLowerCase();
+        this._router.navigate([currentModulePath]);
       },
       (error) => {
         if (error.status === 403) {
