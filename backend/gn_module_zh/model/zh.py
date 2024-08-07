@@ -53,7 +53,11 @@ class ZH(TZH):
 
     def get_cb_codes(self):
         corine_biotopes = ZH.get_data_by_id(CorZhCb, self.zh.id_zh)
-        return {"cb_codes_corine_biotope": [cb_code.lb_code for cb_code in corine_biotopes]}
+        return {
+            "cb_codes_corine_biotope": [
+                {"lb_code": cb.lb_code, "cb_cover": cb.cb_cover} for cb in corine_biotopes
+            ]
+        }
 
     def get_corine_landcovers(self):
         landcovers = ZH.get_data_by_id(CorZhCorineCover, self.zh.id_zh)

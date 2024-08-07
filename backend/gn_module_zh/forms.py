@@ -488,7 +488,13 @@ def update_corine_biotopes(id_zh, corine_biotopes):
 
 def post_corine_biotopes(id_zh, corine_biotopes):
     for corine_biotope in corine_biotopes:
-        DB.session.add(CorZhCb(id_zh=id_zh, lb_code=corine_biotope["CB_code"]))
+        DB.session.add(
+            CorZhCb(
+                id_zh=id_zh,
+                lb_code=corine_biotope["corinBio"]["CB_code"],
+                cb_cover=corine_biotope["cbCover"],
+            )
+        )
         DB.session.flush()
 
 
