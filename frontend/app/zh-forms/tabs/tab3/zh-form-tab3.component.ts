@@ -26,9 +26,10 @@ export class ZhFormTab3Component implements OnInit {
   public currentZh: any;
   corinBioMetaData: any;
   corinTableCol = [
-    { name: 'CB_code', label: 'Code Corine biotopes' },
-    { name: 'CB_label', label: 'Libellé Corine biotopes' },
-    { name: 'CB_humidity', label: 'Humidité', size: '5%' },
+    { name: 'corinBio', label: 'Code Corine biotopes', subcell: { name: 'CB_code' } },
+    { name: 'corinBio', label: 'Libellé Corine biotopes', subcell: { name: 'CB_label' } },
+    { name: 'corinBio', label: 'Humidité', size: '5%', subcell: { name: 'CB_humidity' } },
+    { name: 'cbCover', label: 'Recouvrement sur la ZH (%)', size: '5%' },
   ];
   // subcell : if the data contain a list inside the data list
   //   example use : consider this
@@ -71,18 +72,23 @@ export class ZhFormTab3Component implements OnInit {
     },
     { name: 'remark_activity', label: 'Remarques' },
   ];
-  listCorinBio = [];
+  listCorinBio: any = [];
+  patchCorinBio: boolean = false;
   posted: boolean = false;
   patchActivity: boolean = false;
   activityForm: FormGroup;
+  corinBioForm: FormGroup;
   modalButtonLabel: string;
   modalTitle: string;
+  addModalBtnLabel: string;
+  cb_to_patch: any;
 
   selectedItems = [];
   listActivity: any = [];
   activitiesInput: any = [];
   submitted: boolean;
   formImpactSubmitted: boolean;
+  formCorinSubmitted: boolean;
 
   constructor(
     private fb: FormBuilder,
@@ -103,6 +109,11 @@ export class ZhFormTab3Component implements OnInit {
       frontId: null,
     });
 
+    this.corinBioForm = this.fb.group({
+      corinBio: [null, Validators.required],
+      cbCover: [null, Validators.compose([Validators.min(0), Validators.max(100)])],
+    });
+
     this.getMetaData();
     this.createForm();
 
@@ -121,6 +132,7 @@ export class ZhFormTab3Component implements OnInit {
       if (zh) {
         this.currentZh = zh;
         this.listActivity = [];
+        this.listCorinBio = [];
         const corineLandcovers = [];
         this.formMetaData.OCCUPATION_SOLS.forEach((critere) => {
           if (this.currentZh.properties.id_corine_landcovers.includes(critere.id_nomenclature)) {
@@ -131,9 +143,13 @@ export class ZhFormTab3Component implements OnInit {
           this.currentZh.properties.cb_codes_corine_biotope &&
           this.currentZh.properties.cb_codes_corine_biotope.length > 0
         ) {
-          this.listCorinBio = this.corinBioMetaData.filter((v) =>
-            this.currentZh.properties.cb_codes_corine_biotope.includes(v.CB_code)
-          );
+          this.currentZh.properties.cb_codes_corine_biotope.forEach((cb) => {
+            this.corinBioMetaData.find((item) => {
+              if (item.CB_code == cb.lb_code) {
+                this.listCorinBio.push({ corinBio: item, cbCover: cb.cb_cover });
+              }
+            });
+          });
         }
         this.currentZh.properties.activities.forEach((activity) => {
           let impacts = [];
@@ -216,7 +232,6 @@ export class ZhFormTab3Component implements OnInit {
     this.form = this.fb.group({
       id_sdage: [null, Validators.required],
       id_sage: null,
-      corinBio: null,
       id_corine_landcovers: null,
       remark_pres: null,
       id_thread: null,
@@ -242,30 +257,67 @@ export class ZhFormTab3Component implements OnInit {
       ),
       // Not to display a Corine that is already in the table
       map((term) =>
-        term.filter((t) => !this.listCorinBio.map((c) => c.CB_code).includes(t.CB_code))
+        term.filter((t) => !this.listCorinBio.map((c) => c.corinBio.CB_code).includes(t.CB_code))
       )
     );
 
   formatter = (result: any) => `${result.CB_code} ${result.CB_label}`;
 
-  onAddCorinBio() {
-    if (this.form.value.corinBio) {
-      let itemExist = this.listCorinBio.some(
-        (item) => item.CB_code == this.form.value.corinBio.CB_code
-      );
-      if (!itemExist && this.form.value.corinBio.CB_code) {
-        this.listCorinBio.push(this.form.value.corinBio);
-      }
-      this.form.get('corinBio').reset();
-      this.canChangeTab.emit(false);
-    }
+  // open the add CorinBio modal
+  onAddCorinBio(event: any, modal: any) {
+    this.canChangeTab.emit(false);
+    this.patchCorinBio = false;
+    this.addModalBtnLabel = 'Ajouter';
+
+    this.modalTitle = "Ajout d'un habitat Corine Biotopes";
+    event.stopPropagation();
+    this.ngbModal.open(modal, {
+      centered: true,
+      size: 'lg',
+      windowClass: 'bib-modal',
+    });
+    this.corinBioForm.reset();
   }
 
   onDeleteCorin(CB_code: string) {
     this.listCorinBio = this.listCorinBio.filter((item) => {
-      return item.CB_code != CB_code;
+      return item.corinBio.CB_code != CB_code;
     });
     this.canChangeTab.emit(false);
+  }
+
+  // open the edit corineBio modal
+  onEditCorinBio(modal: any, corinBio: any) {
+    this.patchCorinBio = true;
+    this.addModalBtnLabel = 'Modifier';
+    this.modalTitle = 'Modifier un habitat Corine Biotopes';
+    this.cb_to_patch = corinBio;
+    this.corinBioForm.patchValue({
+      corinBio: corinBio.corinBio,
+      cbCover: corinBio.cbCover,
+    });
+    this._modalService.open(
+      modal,
+      this.listCorinBio.map((item) => item.corinBio),
+      this.corinBioMetaData,
+      corinBio
+    );
+  }
+
+  onPatchCorinBio() {
+    this.patchActivity = false;
+    this.formCorinSubmitted = true;
+    if (this.corinBioForm.valid) {
+      let cb = this.corinBioForm.value;
+      this.listCorinBio = this.listCorinBio.map((item) =>
+        item.corinBio != this.cb_to_patch.corinBio ? item : cb
+      );
+      this.ngbModal.dismissAll();
+      this.corinBioForm.reset();
+      this.canChangeTab.emit(false);
+      this.formCorinSubmitted = false;
+      this.cb_to_patch = {};
+    }
   }
 
   onAddActivity(event, modal) {
@@ -325,7 +377,7 @@ export class ZhFormTab3Component implements OnInit {
   onEditActivity(modal: any, activity: any) {
     this.patchActivity = true;
     this.modalButtonLabel = 'Modifier';
-    this.modalTitle = "Modifier l'activié humaine";
+    this.modalTitle = "Modifier l'activité humaine";
     this.selectedItems = activity.impacts.impacts;
     const selectedActivity = this.activitiesInput.find(
       (item) => item.id_nomenclature == activity.human_activity.id_nomenclature
@@ -390,6 +442,22 @@ export class ZhFormTab3Component implements OnInit {
 
   onDeSelectAll() {
     this.activityForm.get('impacts').setValue([]);
+  }
+
+  // add a new CorineBio to CorineBio array
+  onPostCorinBio() {
+    this.patchCorinBio = false;
+    this.formCorinSubmitted = true;
+    if (this.corinBioForm.valid) {
+      this.listCorinBio.push({
+        corinBio: this.corinBioForm.value.corinBio,
+        cbCover: this.corinBioForm.value.cbCover,
+      });
+      this.ngbModal.dismissAll();
+      this.corinBioForm.reset();
+      this.canChangeTab.emit(false);
+      this.formCorinSubmitted = false;
+    }
   }
 
   onFormSubmit() {

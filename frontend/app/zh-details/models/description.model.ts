@@ -28,6 +28,7 @@ interface Corine {
   code: string;
   label: string;
   Humidité: string;
+  recouvrement: string;
 }
 
 interface Activities {
