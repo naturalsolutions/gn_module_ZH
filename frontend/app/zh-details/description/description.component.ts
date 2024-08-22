@@ -16,6 +16,7 @@ export class DescriptionComponent {
     { name: 'code', label: 'Code Corine biotopes' },
     { name: 'label', label: 'Libellé Corine biotopes' },
     { name: 'Humidité', label: 'Humidité', size: '5%' },
+    { name: 'recouvrement', label: 'Recouvrement sur la ZH (%)', size: '5%' },
   ];
   activitiesTableCols: TableColumn[] = [
     {

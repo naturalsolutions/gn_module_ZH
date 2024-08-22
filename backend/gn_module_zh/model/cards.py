@@ -531,7 +531,15 @@ class Presentation:
             "area": self.area,
             "sdage": Utils.get_mnemo(self.id_sdage),
             "typologie_locale": Utils.get_mnemo(self.id_sage),
-            "corine_biotope": [cb.__str__() for cb in self.cb_codes_corine_biotope],
+            "corine_biotope": [
+                {
+                    "code": cb["lb_code"],
+                    "label": CorineBiotope(cb["lb_code"]).__str__()["label"],
+                    "Humidité": CorineBiotope(cb["lb_code"]).__str__()["Humidité"],
+                    "recouvrement": cb["cb_cover"],
+                }
+                for cb in self.cb_codes_corine_biotope
+            ],
             "remarques": Utils.get_string(self.remark_pres),
             "ef_area": self.ef_area,
         }
@@ -1154,7 +1162,7 @@ class Card(ZH):
         return self.description.__str__()
 
     def __get_cb(self):
-        return [CorineBiotope(cb) for cb in sorted(self.properties["cb_codes_corine_biotope"])]
+        return [cb for cb in self.properties["cb_codes_corine_biotope"]]
 
     def __set_use(self):
         self.description.use = Use()
