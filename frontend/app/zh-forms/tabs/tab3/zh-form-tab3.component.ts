@@ -463,7 +463,8 @@ export class ZhFormTab3Component implements OnInit {
   }
 
   onFormSubmit() {
-    if (this.form.valid) {
+    console.log(this.listCorinBio.length);
+    if (this.form.valid && this.listCorinBio.length > 0) {
       this.submitted = true;
       this.$_fromChangeSub.unsubscribe();
       let formToPost = {

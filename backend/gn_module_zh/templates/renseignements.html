@@ -9,6 +9,14 @@
       <span>{{ data['renseignements']['identification']['code'] }}</span>
     </div>
     <div class="fieldset" id="fieldset-r">
+      <label>Date création terrain</label>
+      <span>{{ data['renseignements']['identification']['field_date'] | datetime_format }}</span>
+    </div>
+    <div class="fieldset" id="fieldset-r">
+      <label>Observeur</label>
+      <span>{{ data['renseignements']['identification']['observer'] }}</span>
+    </div>
+    <div class="fieldset" id="fieldset-r">
       <label>Typologie SDAGE</label>
       <span>{{ data['description']['presentation']['sdage'] }}</span>
     </div>

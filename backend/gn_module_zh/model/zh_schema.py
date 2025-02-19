@@ -248,6 +248,8 @@ class TZH(ZhModel):
     main_pict_id = DB.Column(DB.Integer)
     area = DB.Column(DB.Float)
     main_id_rb = DB.Column(DB.Integer, nullable=True)
+    field_creation_date = DB.Column(DB.DateTime, nullable=True)
+    observer = DB.Column(DB.Unicode)
 
     sdage = DB.relationship(
         TNomenclatures,

@@ -48,13 +48,23 @@
       <div class="form-row">
         <div class="form-group col-md-6">
           <small>Types d’habitats Corine biotopes humides (H) ou potentiellement humides (P)</small>
-          
         </div>
         <div class="form-group d-flex align-items-end col-md-6">
-          <button mat-raised-button color="primary" (click)="onAddCorinBio($event, corinBioModal)">
+          <button
+            mat-raised-button
+            color="primary"
+            (click)="onAddCorinBio($event, corinBioModal)"
+          >
             <mat-icon>add_box</mat-icon>
             Habitat
           </button>
+          <small
+            *ngIf="listCorinBio == 0"
+            class="error-msg"
+            class="error-msg ml-2"
+          >
+            Champ requis
+          </small>
         </div>
       </div>
       <div
@@ -70,6 +80,7 @@
           (onEdit)="onEditCorinBio(corinBioModal, $event)"
         ></zh-table>
       </div>
+
       <div class="form-row">
         <div class="form-group col-md-12">
           <small>Remarques</small>
@@ -278,13 +289,21 @@
       {{ modalButtonLabel }}
     </button>
   </div>
-  </ng-template>
+</ng-template>
 
 <!-- Modal corine biotope-->
-<ng-template #corinBioModal let-c="close" let-d="dismiss">
+<ng-template
+  #corinBioModal
+  let-c="close"
+  let-d="dismiss"
+>
   <div class="modal-header">
     <h6>{{ modalTitle }}</h6>
-    <button mat-icon-button class="closeModalBtn" (click)="c()">
+    <button
+      mat-icon-button
+      class="closeModalBtn"
+      (click)="c()"
+    >
       <mat-icon class="cancel-icon">cancel</mat-icon>
     </button>
   </div>
@@ -309,8 +328,9 @@
               corinBioForm.controls.corinBio.errors?.required
             "
             class="error-msg"
-            >Champ requis</small
           >
+            Champ requis
+          </small>
         </div>
         <div class="form-group col-md-12">
           <small>Recouvrement sur la ZH (%)</small>
@@ -328,7 +348,8 @@
                 corinBioForm.controls.cbCover.errors?.max)
             "
             class="error-msg"
-            >La valeur doit être comprise entre 0 et 100
+          >
+            La valeur doit être comprise entre 0 et 100
           </small>
         </div>
       </div>

@@ -58,7 +58,16 @@ def update_tzh(data):
 # tab 0
 
 
-def create_zh(form_data, info_role, zh_date, polygon, zh_area, ref_geo_referentiels):
+def create_zh(
+    form_data,
+    info_role,
+    zh_date,
+    polygon,
+    zh_area,
+    ref_geo_referentiels,
+    field_creation_date,
+    observer,
+):
     # try:
     uuid_id_lim_list = uuid.uuid4()
     post_cor_lim_list(uuid_id_lim_list, form_data["critere_delim"])
@@ -71,6 +80,9 @@ def create_zh(form_data, info_role, zh_date, polygon, zh_area, ref_geo_referenti
         "river_basin", func.ST_GeomFromGeoJSON(str(form_data["geom"]["geometry"]))
     )
     main_id_rb = get_main_rb(rbs, form_data["geom"]["geometry"])
+
+    date_str = f"{field_creation_date['day']:02d}/{field_creation_date['month']:02d}/{field_creation_date['year']}"
+    date_obj = datetime.datetime.strptime(date_str, "%d/%m/%Y")
 
     # create zh : fill pr_zh.t_zh
     new_zh = TZH(
@@ -86,6 +98,8 @@ def create_zh(form_data, info_role, zh_date, polygon, zh_area, ref_geo_referenti
         geom=polygon,
         area=zh_area,
         main_id_rb=main_id_rb,
+        field_creation_date=date_obj,
+        observer=observer,
     )
     DB.session.add(new_zh)
     DB.session.flush()
@@ -136,6 +150,8 @@ def create_zh(form_data, info_role, zh_date, polygon, zh_area, ref_geo_referenti
     ).scalar_one()
 
     post_fct_delim(new_zh.id_zh, [fct_delim_default_id])
+
+    update_corine_biotopes(new_zh.id_zh, form_data["corine_biotopes"])
 
     DB.session.flush()
     return new_zh.id_zh
@@ -250,7 +266,9 @@ def post_cor_zh_fct_area(geom, id_zh):
     #     )
 
 
-def update_zh_tab0(form_data, polygon, area, info_role, zh_date, geo_refs):
+def update_zh_tab0(
+    form_data, polygon, area, info_role, zh_date, geo_refs, field_creation_date, observer
+):
     # try:
     is_geom_new = check_polygon(polygon, form_data["id_zh"])
 
@@ -272,7 +290,11 @@ def update_zh_tab0(form_data, polygon, area, info_role, zh_date, geo_refs):
         update_cor_zh_hydro(form_data["geom"]["geometry"], form_data["id_zh"])
         ef_area = update_cor_zh_fct_area(form_data["geom"]["geometry"], form_data["id_zh"])
 
+    date_str = f"{field_creation_date['day']:02d}/{field_creation_date['month']:02d}/{field_creation_date['year']}"
+    date_obj = datetime.datetime.strptime(date_str, "%d/%m/%Y")
+
     # update zh : fill pr_zh.t_zh
+
     DB.session.execute(
         update(TZH)
         .where(TZH.id_zh == form_data["id_zh"])
@@ -286,8 +308,11 @@ def update_zh_tab0(form_data, polygon, area, info_role, zh_date, geo_refs):
             area=area,
             ef_area=ef_area,
             main_id_rb=main_id_rb,
+            field_creation_date=date_obj,
+            observer=observer,
         )
     )
+    update_corine_biotopes(form_data["id_zh"], form_data["corine_biotopes"])
 
     DB.session.flush()
     return form_data["id_zh"]

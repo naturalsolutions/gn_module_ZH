@@ -23,6 +23,8 @@ interface Identification {
   inclus: string; //partie d'un ensemble String or Boolean ??
   ensemble: string;
   code: string;
+  field_date: string;
+  observer: string;
 }
 
 interface Auteur {

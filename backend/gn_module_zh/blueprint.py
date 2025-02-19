@@ -643,6 +643,8 @@ def get_tab_data(id_tab):
                 geom["polygon"],
                 area,
                 active_geo_refs,
+                form_data["field_creation_date"],
+                form_data["observer"],
             )
             intersection = geom["is_intersected"]
         else:
@@ -658,6 +660,8 @@ def get_tab_data(id_tab):
                 g.current_user,
                 form_data["update_date"],
                 active_geo_refs,
+                form_data["field_creation_date"],
+                form_data["observer"],
             )
             intersection = geom["is_intersected"]
 

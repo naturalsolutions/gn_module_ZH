@@ -1,9 +1,10 @@
 import { Component, EventEmitter, HostListener, Input, OnInit, Output } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import { Subscription } from 'rxjs';
+import { Subscription, Observable } from 'rxjs';
 import { GeoJSON } from 'leaflet';
 import * as L from 'leaflet';
+import { debounceTime, distinctUntilChanged, map } from 'rxjs/operators';
 import { MapService } from '@geonature_common/map/map.service';
 import { ToastrService } from 'ngx-toastr';
 import { ZhDataService } from '../../../services/zh-data.service';
@@ -11,6 +12,12 @@ import { TabsService } from '../../../services/tabs.service';
 import { ErrorTranslatorService } from '../../../services/error-translator.service';
 import { PbfService } from '../../../services/pbf.service';
 import { HierarchyService } from '../../../services/hierarchy.service';
+import { NgbDateParserFormatter } from '@ng-bootstrap/ng-bootstrap';
+import { NgbDatepickerI18n } from '@ng-bootstrap/ng-bootstrap';
+import { DatepickerI18n, I18n } from '../../../services/datepicker-i18n.service';
+import { NgbDateFRParserFormatter } from '../../../services/dateFrFormatter';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { ModalService } from '../../../services/modal.service';
 
 const GEOM_CONTAINED_ID = 1;
 
@@ -18,6 +25,11 @@ const GEOM_CONTAINED_ID = 1;
   selector: 'zh-form-tab0',
   templateUrl: './zh-form-tab0.component.html',
   styleUrls: ['./zh-form-tab0.component.scss'],
+  providers: [
+    I18n,
+    { provide: NgbDatepickerI18n, useClass: DatepickerI18n },
+    { provide: NgbDateParserFormatter, useClass: NgbDateFRParserFormatter },
+  ],
 })
 export class ZhFormTab0Component implements OnInit {
   @Input() formMetaData;
@@ -29,6 +41,8 @@ export class ZhFormTab0Component implements OnInit {
   public cardContentHeight: number;
   public critDelim: any;
   public sdage: any;
+  public field_creation_date: any;
+  public observer: any;
   public idOrg: any;
   public $_geojsonSub: Subscription;
   public $_currentZhSub: Subscription;
@@ -39,6 +53,22 @@ export class ZhFormTab0Component implements OnInit {
   private geomLayers: any;
   public zhId: number;
   public toggleChecked: boolean = false; // TODO: PUT INTO PARAMETER ?
+  corinTableCol = [
+    { name: 'corinBio', label: 'Code Corine biotopes', subcell: { name: 'CB_code' } },
+    { name: 'corinBio', label: 'Libellé Corine biotopes', subcell: { name: 'CB_label' } },
+    { name: 'corinBio', label: 'Humidité', size: '5%', subcell: { name: 'CB_humidity' } },
+    { name: 'cbCover', label: 'Recouvrement sur la ZH (%)', size: '5%' },
+  ];
+  corinBioMetaData: any;
+  listCorinBio: any = [];
+  patchCorinBio: boolean = false;
+  corinBioForm: FormGroup;
+  cb_to_patch: any;
+  formCorinSubmitted: boolean;
+  modalButtonLabel: string;
+  modalTitle: string;
+  addModalBtnLabel: string;
+  patchActivity: boolean = false;
 
   constructor(
     private fb: FormBuilder,
@@ -49,7 +79,10 @@ export class ZhFormTab0Component implements OnInit {
     private _toastr: ToastrService,
     private _error: ErrorTranslatorService,
     private _pbfService: PbfService,
-    public hierarchy: HierarchyService
+    public hierarchy: HierarchyService,
+    private dateParser: NgbDateParserFormatter,
+    public ngbModal: NgbModal,
+    private _modalService: ModalService
   ) {}
 
   ngOnInit() {
@@ -100,12 +133,31 @@ export class ZhFormTab0Component implements OnInit {
             selectedCritDelim.push(critere);
           }
         });
+        const field_creation_date = new Date(
+          this._currentZh.properties.field_creation_date.split(' ')[0]
+        ).toLocaleDateString('fr-FR');
         this.form.patchValue({
           id_org: this._currentZh.properties.id_org,
           main_name: this._currentZh.properties.main_name,
           critere_delim: selectedCritDelim,
           sdage: this._currentZh.properties.id_sdage,
+          field_creation_date: this.dateParser.parse(field_creation_date),
+          observer: this._currentZh.properties.observer,
         });
+        this.listCorinBio = [];
+        if (
+          this._currentZh.properties.cb_codes_corine_biotope &&
+          this._currentZh.properties.cb_codes_corine_biotope.length > 0
+        ) {
+          this._currentZh.properties.cb_codes_corine_biotope.forEach((cb) => {
+            this.corinBioMetaData.find((item) => {
+              if (item.CB_code == cb.lb_code) {
+                this.listCorinBio.push({ corinBio: item, cbCover: cb.cb_cover });
+              }
+            });
+          });
+        }
+
         // Must put a set timeout here otherwise
         // this._mapService is undefined...
         setTimeout(() => {
@@ -127,6 +179,103 @@ export class ZhFormTab0Component implements OnInit {
         this.canChangeTab.emit(true);
       }
     });
+  }
+
+  search = (text$: Observable<string>) =>
+    text$.pipe(
+      debounceTime(200),
+      distinctUntilChanged(),
+      map((term) =>
+        term.length < 1
+          ? []
+          : this.corinBioMetaData
+              .filter(
+                (v) =>
+                  v.CB_label.toLowerCase().indexOf(term.toLowerCase()) > -1 ||
+                  v.CB_code.toLowerCase().indexOf(term.toLowerCase()) > -1
+              )
+              .slice(0, 10)
+      ),
+      // Not to display a Corine that is already in the table
+      map((term) =>
+        term.filter((t) => !this.listCorinBio.map((c) => c.corinBio.CB_code).includes(t.CB_code))
+      )
+    );
+
+  formatter = (result: any) => `${result.CB_code} ${result.CB_label}`;
+
+  // open the add CorinBio modal
+  onAddCorinBio(event: any, modal: any) {
+    this.canChangeTab.emit(false);
+    this.patchCorinBio = false;
+    this.addModalBtnLabel = 'Ajouter';
+
+    this.modalTitle = "Ajout d'un habitat Corine Biotopes";
+    event.stopPropagation();
+    this.ngbModal.open(modal, {
+      centered: true,
+      size: 'lg',
+      windowClass: 'bib-modal',
+    });
+    this.corinBioForm.reset();
+  }
+
+  onDeleteCorin(CB_code: string) {
+    this.listCorinBio = this.listCorinBio.filter((item) => {
+      return item.corinBio.CB_code != CB_code;
+    });
+    this.canChangeTab.emit(false);
+  }
+
+  // add a new CorineBio to CorineBio array
+  onPostCorinBio() {
+    this.patchCorinBio = false;
+    this.formCorinSubmitted = true;
+    if (this.corinBioForm.valid) {
+      this.listCorinBio.push({
+        corinBio: this.corinBioForm.value.corinBio,
+        cbCover: this.corinBioForm.value.cbCover,
+      });
+      this.ngbModal.dismissAll();
+      this.corinBioForm.reset();
+      this.canChangeTab.emit(false);
+      this.formCorinSubmitted = false;
+    }
+  }
+
+  // open the edit corineBio modal
+  onEditCorinBio(modal: any, corinBio: any) {
+    this.patchCorinBio = true;
+    this.addModalBtnLabel = 'Modifier';
+    this.modalTitle = 'Modifier un habitat Corine Biotopes';
+    this.cb_to_patch = corinBio;
+    this.corinBioForm.patchValue({
+      corinBio: corinBio.corinBio,
+      cbCover: corinBio.cbCover,
+    });
+    this._modalService.open(
+      modal,
+      this.listCorinBio.map((item) => item.corinBio),
+      this.corinBioMetaData,
+      corinBio
+    );
+  }
+
+  onPatchCorinBio() {
+    console.log('test');
+    this.patchActivity = false;
+    this.formCorinSubmitted = true;
+    if (this.corinBioForm.valid) {
+      let cb = this.corinBioForm.value;
+      this.listCorinBio = this.listCorinBio.map((item) =>
+        item.corinBio != this.cb_to_patch.corinBio ? item : cb
+      );
+      this.ngbModal.dismissAll();
+      this.corinBioForm.reset();
+      this.canChangeTab.emit(false);
+      this.formCorinSubmitted = false;
+      this.cb_to_patch = {};
+    }
   }
 
   calcCardContentHeight() {
@@ -155,6 +304,12 @@ export class ZhFormTab0Component implements OnInit {
       main_name: [null, Validators.required],
       critere_delim: [null, Validators.required],
       sdage: ['', Validators.required],
+      field_creation_date: [null, Validators.required],
+      observer: ['', Validators.required],
+    });
+    this.corinBioForm = this.fb.group({
+      corinBio: [null, Validators.required],
+      cbCover: [null, Validators.compose([Validators.min(0), Validators.max(100)])],
     });
     this.form.valueChanges.subscribe(() => {
       this.canChangeTab.emit(false);
@@ -168,6 +323,9 @@ export class ZhFormTab0Component implements OnInit {
       main_name: formValues.main_name,
       critere_delim: [],
       sdage: formValues.sdage,
+      field_creation_date: formValues.field_creation_date,
+      observer: formValues.observer,
+      corine_biotopes: this.listCorinBio,
       geom: null,
     };
     // Get the geometry as a featureCollection from the
@@ -177,7 +335,7 @@ export class ZhFormTab0Component implements OnInit {
     );
     if (this.geometry) {
       formToPost.geom = this.geometry;
-      if (this.form.valid) {
+      if (this.form.valid && this.listCorinBio.length > 0) {
         formValues.critere_delim.forEach((critere) => {
           formToPost.critere_delim.push(critere.id_nomenclature);
         });
@@ -277,6 +435,7 @@ export class ZhFormTab0Component implements OnInit {
 
   getMetaData() {
     this.idOrg = this.formMetaData['BIB_ORGANISMES'];
+    this.corinBioMetaData = [...this.formMetaData['CORINE_BIO']];
     this.critDelim = this.formMetaData['CRIT_DELIM'];
     this.sdage = this.formMetaData['SDAGE'];
   }

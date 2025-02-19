@@ -113,12 +113,23 @@ class Criteria:
 
 
 class Identification:
-    def __init__(self, main_name, other_name, is_id_site_space, id_site_space, code):
+    def __init__(
+        self,
+        main_name,
+        other_name,
+        is_id_site_space,
+        id_site_space,
+        code,
+        field_creation_date,
+        observer,
+    ):
         self.main_name = main_name
         self.other_name = other_name
         self.is_id_site_space = is_id_site_space
         self.id_site_space = id_site_space
         self.code = code
+        self.field_creation_date = field_creation_date
+        self.observer = observer
 
     def __str__(self):
         return {
@@ -127,6 +138,8 @@ class Identification:
             "inclus": Utils.get_bool(self.is_id_site_space),
             "ensemble": self.__get_site_space_name(),
             "code": self.code,
+            "field_date": self.field_creation_date,
+            "observer": self.observer,
         }
 
     def __get_site_space_name(self):
@@ -1085,6 +1098,8 @@ class Card(ZH):
             self.properties["is_id_site_space"],
             self.properties["id_site_space"],
             self.properties["code"],
+            self.properties["field_creation_date"],
+            self.properties["observer"],
         )
 
     def __set_localisation(self):

@@ -23,6 +23,12 @@
         <zh-label label="Code de la zone humide :">
           <span>{{ data.identification?.code }}</span>
         </zh-label>
+        <zh-label label="Date création terrain :">
+          <span>{{ data.identification?.field_date | date: 'dd/MM/y' }}</span>
+        </zh-label>
+        <zh-label label="Observateur :">
+          <span>{{ data.identification?.observer }}</span>
+        </zh-label>
       </fieldset>
     </div>
     <div class="col-12 col-xl-6 col-lg-6 col-md-6">

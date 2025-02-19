@@ -126,6 +126,110 @@
               </small>
             </div>
           </div>
+
+          <div class="form-row">
+            <div class="form-group col-md-6">
+              <small>
+                Types d’habitats Corine biotopes humides (H) ou potentiellement humides (P)
+              </small>
+            </div>
+          </div>
+
+          <div class="form-group col-md-6 d-flex align-items-center">
+            <button
+              mat-raised-button
+              color="primary"
+              (click)="onAddCorinBio($event, corinBioModal)"
+            >
+              <mat-icon>add_box</mat-icon>
+              Habitat
+            </button>
+            <small
+              *ngIf="
+                (corinBioForm.controls.corinBio.touched || submitted) &&
+                corinBioForm.controls.corinBio.errors?.required &&
+                listCorinBio == 0
+              "
+              class="error-msg"
+              class="error-msg ml-2"
+            >
+              Champ requis
+            </small>
+          </div>
+          <div
+            *ngIf="listCorinBio && listCorinBio.length > 0"
+            class="table-responsive"
+          >
+            <zh-table
+              [tableCols]="corinTableCol"
+              [data]="listCorinBio"
+              [editable]="true"
+              [deletable]="true"
+              (onDelete)="onDeleteCorin($event?.corinBio.CB_code)"
+              (onEdit)="onEditCorinBio(corinBioModal, $event)"
+            ></zh-table>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group col-md-12">
+              <small class="required">Date de création terrain</small>
+              <div class="input-group">
+                <input
+                  class="form-control"
+                  placeholder="Date de création terrain"
+                  [formControl]="form.controls.field_creation_date"
+                  name="fcd"
+                  ngbDatepicker
+                  #d0="ngbDatepicker"
+                />
+                <div class="input-group-append">
+                  <button
+                    class="btn btn-sm btn-outline-shadow"
+                    (click)="d0.toggle()"
+                    type="button"
+                  >
+                    <i
+                      _ngcontent-c41=""
+                      aria-hidden="true"
+                      class="fa fa-calendar"
+                    ></i>
+                  </button>
+                </div>
+              </div>
+              <small
+                *ngIf="
+                  (form.controls.field_creation_date.touched || submitted) &&
+                  form.controls.field_creation_date.errors?.required
+                "
+                class="error-msg"
+              >
+                Champ requis
+              </small>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group col-md-12">
+              <small class="required">Observateur</small>
+              <div class="input-group">
+                <input
+                  class="form-control"
+                  placeholder="Observateur"
+                  [formControl]="form.controls.observer"
+                  name="obs"
+                />
+              </div>
+              <small
+                *ngIf="
+                  (form.controls.observer.touched || submitted) &&
+                  form.controls.observer.errors?.required
+                "
+                class="error-msg"
+              >
+                Champ requis
+              </small>
+            </div>
+          </div>
         </fieldset>
       </form>
       <div class="footer-btn">
@@ -149,3 +253,80 @@
     </div>
   </div>
 </div>
+
+<!-- Modal corine biotope-->
+<ng-template
+  #corinBioModal
+  let-c="close"
+  let-d="dismiss"
+>
+  <div class="modal-header">
+    <h6>{{ modalTitle }}</h6>
+    <button
+      mat-icon-button
+      class="closeModalBtn"
+      (click)="c()"
+    >
+      <mat-icon class="cancel-icon">cancel</mat-icon>
+    </button>
+  </div>
+  <div class="modal-body">
+    <form [formGroup]="corinBioForm">
+      <div class="form-row">
+        <div class="form-group col-md-6">
+          <small>Corine biotopes</small>
+          <input
+            id="typeahead-basic"
+            type="text"
+            class="form-control"
+            [formControl]="corinBioForm.controls.corinBio"
+            placeholder="Tapez les premières lettres..."
+            [resultFormatter]="formatter"
+            [inputFormatter]="formatter"
+            [ngbTypeahead]="search"
+          />
+          <small
+            *ngIf="
+              (corinBioForm.controls.corinBio.touched || modalFormSubmitted) &&
+              corinBioForm.controls.corinBio.errors?.required
+            "
+            class="error-msg"
+          >
+            Champ requis
+          </small>
+        </div>
+        <div class="form-group col-md-12">
+          <small>Recouvrement sur la ZH (%)</small>
+          <input
+            class="form-control"
+            [formControl]="corinBioForm.controls.cbCover"
+            type="number"
+            min="0"
+            max="100"
+          />
+          <small
+            *ngIf="
+              corinBioForm.controls.cbCover.value &&
+              (corinBioForm.controls.cbCover.errors?.min ||
+                corinBioForm.controls.cbCover.errors?.max)
+            "
+            class="error-msg"
+          >
+            La valeur doit être comprise entre 0 et 100
+          </small>
+        </div>
+      </div>
+    </form>
+  </div>
+  <div class="modal-footer">
+    <button
+      type="button"
+      mat-raised-button
+      color="primary"
+      class="uppercase"
+      (click)="patchCorinBio ? onPatchCorinBio() : onPostCorinBio()"
+    >
+      {{ addModalBtnLabel }}
+    </button>
+  </div>
+</ng-template>
