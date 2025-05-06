@@ -115,3 +115,12 @@
     </div>
   </div>
 </div>
+
+<div class="row">
+  <div class="fieldset" id="fieldset-r">
+    <label>Hydromorphie</label>
+    {% if data['description']['presentation']['hydromorphie'] %}
+    <span>{{ data['description']['presentation']['hydromorphie'] }}</span>
+    {% endif %}
+  </div>
+</div>

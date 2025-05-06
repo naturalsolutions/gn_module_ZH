@@ -9,6 +9,7 @@ interface Presentation {
   sdage: string;
   typologie_locale: string;
   corine_biotope: Corine[];
+  hydromorphie: string;
   remarques: null | string;
   area: any;
   ef_area: any;

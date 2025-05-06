@@ -83,6 +83,16 @@
       </div>
       <div class="form-row">
         <div class="form-group col-md-12">
+          <small>Trace d'hydromorphie caractéristique de la zone humide</small>
+            <select class="form-control" [formControl]="form.controls.id_hydromorphy">
+              <option *ngFor="let hydro of formMetaData.HYDROMORPHY" [ngValue]="hydro.id_nomenclature">
+                {{ hydro.mnemonique }}
+              </option>
+            </select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group col-md-12">
           <small>Remarques</small>
           <textarea
             [formControl]="form.controls.remark_pres"
