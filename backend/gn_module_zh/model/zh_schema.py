@@ -248,7 +248,9 @@ class TZH(ZhModel):
     main_pict_id = DB.Column(DB.Integer)
     area = DB.Column(DB.Float)
     main_id_rb = DB.Column(DB.Integer, nullable=True)
-    id_hydromorphy = DB.Column(DB.Integer, ForeignKey(TNomenclatures.id_nomenclature), nullable=True)
+    id_hydromorphy = DB.Column(
+        DB.Integer, ForeignKey(TNomenclatures.id_nomenclature), nullable=True
+    )
 
     sdage = DB.relationship(
         TNomenclatures,

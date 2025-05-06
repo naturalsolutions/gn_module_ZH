@@ -69,7 +69,7 @@ nomenclatures = [
     "ETAT_CONSERVATION",
     "NIVEAU_PRIORITE",
     "STRAT_GESTION",
-    "HYDROMORPHY"
+    "HYDROMORPHY",
 ]
 
 

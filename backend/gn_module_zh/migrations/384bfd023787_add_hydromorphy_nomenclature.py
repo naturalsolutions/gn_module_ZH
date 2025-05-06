@@ -5,41 +5,49 @@ Revises: ea0eefb3744a
 Create Date: 2025-05-05 11:58:01.439596
 
 """
+
 from alembic import op
 import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '384bfd023787'
-down_revision = 'ea0eefb3744a'
+revision = "384bfd023787"
+down_revision = "ea0eefb3744a"
 branch_labels = None
 depends_on = None
 
 
 def upgrade():
 
-    op.execute("""
+    op.execute(
+        """
         SELECT setval(
             'ref_nomenclatures.bib_nomenclatures_types_id_type_seq',
             (SELECT MAX(id_type) FROM ref_nomenclatures.bib_nomenclatures_types),
             true
         );
-    """)
+    """
+    )
 
-    op.execute("""
+    op.execute(
+        """
         SELECT setval(
             'ref_nomenclatures.t_nomenclatures_id_nomenclature_seq',
             (SELECT MAX(id_nomenclature) FROM ref_nomenclatures.t_nomenclatures),
             true
         );
-    """)
-    
-    op.execute("""
+    """
+    )
+
+    op.execute(
+        """
         INSERT INTO ref_nomenclatures.bib_nomenclatures_types(mnemonique, label_default, definition_default, label_fr, definition_fr, source, statut)
         VALUES ('HYDROMORPHY', 'Trace d''hydromorphie caractéristique de la ZH', 'Trace d''hydromorphie caractéristique de la ZH', 'Trace d''hydromorphie caractéristique de la ZH', 'Trace d''hydromorphie caractéristique de la ZH', 'ZONES_HUMIDES', 'Non validé');
-    """)
+    """
+    )
 
-    op.execute("""
+    op.execute(
+        """
         INSERT INTO ref_nomenclatures.t_nomenclatures(id_type, cd_nomenclature, mnemonique, label_default, definition_default, label_fr, definition_fr, source, statut)
         VALUES 
             (
@@ -97,16 +105,21 @@ def upgrade():
                 'ZONES_HUMIDES',
                 'NON VALIDÉ'
             );
-    """)
+    """
+    )
 
 
 def downgrade():
-    op.execute("""
+    op.execute(
+        """
         DELETE FROM ref_nomenclatures.t_nomenclatures
         WHERE id_type = (SELECT id_type FROM ref_nomenclatures.bib_nomenclatures_types WHERE mnemonique = 'HYDROMORPHY')
-    """)
+    """
+    )
 
-    op.execute("""
+    op.execute(
+        """
         DELETE FROM ref_nomenclatures.bib_nomenclatures_types
         WHERE mnemonique = 'HYDROMORPHY' AND source = 'ZONES_HUMIDES';
-    """)
+    """
+    )

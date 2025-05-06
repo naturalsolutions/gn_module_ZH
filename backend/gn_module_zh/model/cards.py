@@ -536,7 +536,9 @@ class Basin:
 
 
 class Presentation:
-    def __init__(self, area, id_sdage, id_sage, cb_codes_corine_biotope, id_hydromorphy, remark_pres, ef_area):
+    def __init__(
+        self, area, id_sdage, id_sage, cb_codes_corine_biotope, id_hydromorphy, remark_pres, ef_area
+    ):
         self.area: float = area
         self.id_sdage: int = id_sdage
         self.id_sage: int = id_sage

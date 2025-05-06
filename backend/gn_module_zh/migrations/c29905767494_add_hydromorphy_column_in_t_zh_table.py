@@ -5,13 +5,14 @@ Revises: 384bfd023787
 Create Date: 2025-05-05 15:23:11.977050
 
 """
+
 from alembic import op
 import sqlalchemy as sa
 from sqlalchemy import Column, Integer, ForeignKey
 
 # revision identifiers, used by Alembic.
-revision = 'c29905767494'
-down_revision = '384bfd023787'
+revision = "c29905767494"
+down_revision = "384bfd023787"
 branch_labels = None
 depends_on = None
 
@@ -35,8 +36,9 @@ def upgrade():
         remote_cols=["id_nomenclature"],
         source_schema="pr_zh",
         referent_schema="ref_nomenclatures",
-        onupdate="CASCADE"
+        onupdate="CASCADE",
     )
+
 
 def downgrade():
     op.drop_column(
