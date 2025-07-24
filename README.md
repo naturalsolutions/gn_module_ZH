@@ -46,6 +46,15 @@ Voir [ici](/doc/admin.md) la documentation des paramètres de configuration du m
 
 Il vous faut désormais attribuer des permissions aux groupes ou utilisateurs que vous souhaitez, pour qu'ils puissent accéder et utiliser le module (voir https://docs.geonature.fr/admin-manual.html#gestion-des-droits). Si besoin une commande permet d'attribuer automatiquement toutes les permissions dans tous les modules à un groupe ou utilisateur administrateur.
 
+### Les permissions
+
+Par défaut, le module n'est pas accessible aux utilisateurs de GeoNature.
+Il est donc nécessaire de configurer les permissions pour que les Utilisateurs/Groupes puissent accéder aux fonctionnalités du module.
+
+Les permissions, définies à l'utilisateur ou à son groupe sur le module, permettent de donner accès à l'interface et à la création, modification, consultation et suppression des zones humides.
+
+Elles sont configurées dans l'interface d'administration de GeoNature, dans la section `Permissions`, et sont à attribuer à un utilisateur ou au groupe.
+
 ## **Mise à jour**
 
 - Téléchargez la nouvelle version du module
