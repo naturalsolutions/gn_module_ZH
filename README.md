@@ -20,6 +20,8 @@ Ne pas oublier de redémarrer GeoNature après cette installation :
 
 ## **Installation**
 
+### Téléchargement et installation
+
 - Télécharger puis renommer la version souhaitée du module :
 
   ```
@@ -39,21 +41,22 @@ Ne pas oublier de redémarrer GeoNature après cette installation :
   sudo systemctl restart geonature
   ```
 
-Vous pouvez modifier la configuration du module en créant un fichier `zones_humides_config.toml` dans le dossier `config` de GeoNature, en vous inspirant 
+### Configuration
+
+Vous pouvez modifier la configuration du module en créant un fichier `zones_humides_config.toml` dans le dossier `config` de GeoNature, en vous inspirant
 du fichier `zones_humides_config.toml.example` et en surcouchant uniquement les paramètres que vous souhaitez.
 
 Voir [ici](/doc/admin.md) la documentation des paramètres de configuration du module pour les administrateurs.
 
-Il vous faut désormais attribuer des permissions aux groupes ou utilisateurs que vous souhaitez, pour qu'ils puissent accéder et utiliser le module (voir https://docs.geonature.fr/admin-manual.html#gestion-des-droits). Si besoin une commande permet d'attribuer automatiquement toutes les permissions dans tous les modules à un groupe ou utilisateur administrateur.
+### Gestion des permissions
 
-### Les permissions
-
-Par défaut, le module n'est pas accessible aux utilisateurs de GeoNature.
-Il est donc nécessaire de configurer les permissions pour que les Utilisateurs/Groupes puissent accéder aux fonctionnalités du module.
-
-Les permissions, définies à l'utilisateur ou à son groupe sur le module, permettent de donner accès à l'interface et à la création, modification, consultation et suppression des zones humides.
+Les permissions accordées à un utilisateur ou à son groupe sur le module permettent de donner accès à l'interface et à la création, modification, consultation et suppression des zones humides.\
+Par défault, GeoNature met en place des permissions très restrictives et le module n'est pas accessible aux utilisateurs.\
+Il est nécessaire d'attribuer des permissions aux groupes ou utilisateurs que vous souhaitez, pour qu'ils puissent accéder et utiliser le module.
 
 Elles sont configurées dans l'interface d'administration de GeoNature, dans la section `Permissions`, et sont à attribuer à un utilisateur ou au groupe.
+> Voir [la documentation sur les permissions dans GeoNature](https://docs.geonature.fr/admin-manual.html#gestion-des-droits)
+
 
 ## **Mise à jour**
 
