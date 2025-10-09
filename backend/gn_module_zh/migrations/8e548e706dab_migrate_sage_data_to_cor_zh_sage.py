@@ -5,13 +5,14 @@ Revises: 8171f2ed44e3
 Create Date: 2025-09-25 09:14:39.983767
 
 """
+
 from alembic import op
 import sqlalchemy as sa
 from sqlalchemy import Column, Integer
 
 # revision identifiers, used by Alembic.
-revision = '8e548e706dab'
-down_revision = '8171f2ed44e3'
+revision = "8e548e706dab"
+down_revision = "8171f2ed44e3"
 branch_labels = None
 depends_on = None
 
@@ -31,6 +32,7 @@ def upgrade():
         table_name="t_zh",
         column_name="id_sage",
     )
+
 
 def downgrade():
     op.add_column(

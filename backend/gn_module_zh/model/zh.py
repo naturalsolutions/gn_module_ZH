@@ -52,7 +52,7 @@ class ZH(TZH):
     def get_id_references(self):
         ref_list = CorZhRef.get_references_by_id(self.zh.id_zh)
         return {"id_references": [ref.as_dict() for ref in ref_list]}
-    
+
     def get_sage_ids(self):
         sage_ids = CorZhSage.get_sage_by_id(self.zh.id_zh)
         return {"sage_ids": [id for id in sage_ids]}

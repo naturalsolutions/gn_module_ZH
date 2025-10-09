@@ -433,7 +433,7 @@ def update_activities(id_zh, activities):
             message="post_update_activities_error",
             details=str(exc_type) + ": " + str(e.with_traceback(tb)),
         )
-    
+
 
 def update_sages(id_zh, sage_ids):
     try:

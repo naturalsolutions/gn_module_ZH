@@ -125,7 +125,8 @@ export const ModuleConfig = {
   "FONCTIONS_CONNAISSANCE",
   "ETAT_CONSERVATION",
   "NIVEAU_PRIORITE",
-  "STRAT_GESTION"
+  "STRAT_GESTION",
+  "HYDROMORPHY"
  ],
  "pdf_last_page_img": "",
  "pdf_layer_number": 0,
