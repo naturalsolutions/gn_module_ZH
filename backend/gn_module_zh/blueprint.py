@@ -46,6 +46,7 @@ from .forms import (
     update_ownerships,
     update_protections,
     update_refs,
+    update_sages,
     update_tzh,
     update_urban_docs,
     update_zh_tab0,
@@ -679,6 +680,7 @@ def get_tab_data(id_tab):
 
     if id_tab == 3:
         update_tzh(form_data)
+        update_sages(form_data["id_zh"], form_data["sage_ids"])
         update_corine_biotopes(form_data["id_zh"], form_data["corine_biotopes"])
         update_corine_landcover(form_data["id_zh"], form_data["id_corine_landcovers"])
         update_activities(

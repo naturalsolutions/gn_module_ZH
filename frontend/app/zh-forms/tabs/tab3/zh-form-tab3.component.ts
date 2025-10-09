@@ -122,13 +122,16 @@ export class ZhFormTab3Component implements OnInit {
     this.$_currentZhSub = this._dataService.currentZh.subscribe((zh: any) => {
       if (zh) {
         this.currentZh = zh;
+        console.log(this.currentZh.properties);
         this.listActivity = [];
         const corineLandcovers = [];
+
         this.formMetaData.OCCUPATION_SOLS.forEach((critere) => {
           if (this.currentZh.properties.id_corine_landcovers.includes(critere.id_nomenclature)) {
             corineLandcovers.push(critere);
           }
         });
+
         if (
           this.currentZh.properties.cb_codes_corine_biotope &&
           this.currentZh.properties.cb_codes_corine_biotope.length > 0
@@ -180,7 +183,7 @@ export class ZhFormTab3Component implements OnInit {
         });
         this.form.patchValue({
           id_sdage: this.currentZh.properties.id_sdage,
-          id_sage: this.currentZh.properties.id_sage,
+          sage_ids: this.currentZh.properties.sage_ids,
           id_corine_landcovers: corineLandcovers,
           id_hydromorphy: this.currentZh.properties.id_hydromorphy,
           remark_pres: this.currentZh.properties.remark_pres,
@@ -206,7 +209,7 @@ export class ZhFormTab3Component implements OnInit {
 
   onFormValueChanges(): void {
     this.form.get('id_sdage').valueChanges.subscribe((val: number) => {
-      this.form.get('id_sage').reset();
+      this.form.get('sage_ids').reset();
       this.allSage.forEach((item) => {
         if (val in item) {
           this.sage = Object.values(item)[0];
@@ -218,7 +221,7 @@ export class ZhFormTab3Component implements OnInit {
   createForm(): void {
     this.form = this.fb.group({
       id_sdage: [null, Validators.required],
-      id_sage: null,
+      sage_ids: [null],
       corinBio: null,
       id_corine_landcovers: null,
       id_hydromorphy: null,
@@ -403,7 +406,7 @@ export class ZhFormTab3Component implements OnInit {
       let formToPost = {
         id_zh: Number(this.currentZh.properties.id_zh),
         id_sdage: this.form.value.id_sdage,
-        id_sage: this.form.value.id_sage || null,
+        sage_ids: this.form.value.sage_ids || null,
         id_corine_landcovers: [],
         corine_biotopes: this.listCorinBio,
         id_hydromorphy: this.form.value.id_hydromorphy,

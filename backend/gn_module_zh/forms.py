@@ -30,6 +30,7 @@ from .model.zh_schema import (
     CorZhProtection,
     CorZhRb,
     CorZhRef,
+    CorZhSage,
     DefaultsNomenclaturesValues,
     Nomenclatures,
     TActions,
@@ -432,6 +433,30 @@ def update_activities(id_zh, activities):
             message="post_update_activities_error",
             details=str(exc_type) + ": " + str(e.with_traceback(tb)),
         )
+    
+
+def update_sages(id_zh, sage_ids):
+    try:
+        DB.session.execute(delete(CorZhSage).where(CorZhSage.id_zh == id_zh))
+        post_sages(id_zh, sage_ids)
+    except Exception as e:
+        if e.__class__.__name__ == "DataError":
+            raise ZHApiError(
+                message="post_update_sage_db_error",
+                details=str(e.orig.diag.sqlstate + ": " + e.orig.diag.message_primary),
+                status_code=400,
+            )
+        exc_type, value, tb = sys.exc_info()
+        raise ZHApiError(
+            message="post_update_sage_error",
+            details=str(exc_type) + ": " + str(e.with_traceback(tb)),
+        )
+
+
+def post_sages(id_zh, sage_ids):
+    for sage in sage_ids:
+        DB.session.add(CorZhSage(id_zh=id_zh, id_sage=sage))
+        DB.session.flush()
 
 
 def update_corine_biotopes(id_zh, corine_biotopes):

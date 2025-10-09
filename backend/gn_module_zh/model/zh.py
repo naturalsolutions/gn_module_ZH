@@ -16,6 +16,7 @@ from .zh_schema import (
     CorZhLimFs,
     CorZhProtection,
     CorZhRef,
+    CorZhSage,
     TActions,
     TActivity,
     TFunctions,
@@ -51,6 +52,10 @@ class ZH(TZH):
     def get_id_references(self):
         ref_list = CorZhRef.get_references_by_id(self.zh.id_zh)
         return {"id_references": [ref.as_dict() for ref in ref_list]}
+    
+    def get_sage_ids(self):
+        sage_ids = CorZhSage.get_sage_by_id(self.zh.id_zh)
+        return {"sage_ids": [id for id in sage_ids]}
 
     def get_cb_codes(self):
         corine_biotopes = ZH.get_data_by_id(CorZhCb, self.zh.id_zh)
@@ -309,6 +314,7 @@ class ZH(TZH):
         zh.properties.update(self.get_id_lims())
         zh.properties.update(self.get_id_lims_fs())
         zh.properties.update(self.get_id_references())
+        zh.properties.update(self.get_sage_ids())
         zh.properties.update(self.get_cb_codes())
         zh.properties.update(self.get_corine_landcovers())
         zh.properties.update(self.get_activities())

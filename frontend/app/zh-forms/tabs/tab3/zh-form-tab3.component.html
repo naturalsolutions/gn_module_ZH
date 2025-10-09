@@ -29,21 +29,18 @@
             Champ requis
           </small>
         </div>
-        <div class="form-group col-md-6">
-          <small>Sous-type SAGE</small>
-          <select
-            class="form-control"
-            [formControl]="form.controls.id_sage"
-          >
-            <option></option>
-            <option
-              *ngFor="let sg of sage"
-              [ngValue]="sg.id_nomenclature"
-            >
-              {{ sg.mnemonique }}
-            </option>
-          </select>
-        </div>
+
+          <div class="form-group col-md-6">
+            <small>Sous-type SAGE</small>
+            <zh-multiselect
+              [multiple]="true"
+              [hightlightValue]="false"
+              [values]="sage" 
+              [parentFormControl]="form.controls.sage_ids"
+              keyLabel="mnemonique"
+              keyValue="id_nomenclature" />
+          </div>
+
       </div>
       <div class="form-row">
         <div class="form-group col-md-6">

@@ -45,7 +45,9 @@
           </div>
           <div class="col-12 col-xl-6">
             <zh-label label="Sous-type SAGE :">
-              <span>{{ data.presentation.typologie_locale }}</span>
+              <ul>
+                <li *ngFor="let sage of data.presentation.typologie_locale">{{ sage }}</li>
+              </ul>
             </zh-label>
           </div>
         </div>

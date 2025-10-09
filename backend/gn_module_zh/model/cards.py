@@ -541,7 +541,7 @@ class Presentation:
     ):
         self.area: float = area
         self.id_sdage: int = id_sdage
-        self.id_sage: int = id_sage
+        self.id_sage: list(int) = id_sage
         self.cb_codes_corine_biotope: list(CorineBiotope) = cb_codes_corine_biotope
         self.id_hydromorphy: int = id_hydromorphy
         self.remark_pres: str = remark_pres
@@ -551,7 +551,7 @@ class Presentation:
         return {
             "area": self.area,
             "sdage": Utils.get_mnemo(self.id_sdage),
-            "typologie_locale": Utils.get_mnemo(self.id_sage),
+            "typologie_locale": [Utils.get_mnemo(id) for id in self.id_sage],
             "hydromorphie": Utils.get_mnemo(self.id_hydromorphy),
             "corine_biotope": [cb.__str__() for cb in self.cb_codes_corine_biotope],
             "remarques": Utils.get_string(self.remark_pres),
@@ -1166,7 +1166,7 @@ class Card(ZH):
         self.description.presentation = Presentation(
             self.properties["area"],
             self.properties["id_sdage"],
-            self.properties["id_sage"],
+            self.properties["sage_ids"],
             self.__get_cb(),
             self.properties["id_hydromorphy"],
             self.properties["remark_pres"],

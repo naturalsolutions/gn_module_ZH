@@ -196,7 +196,6 @@ class TZH(ZhModel):
     remark_lim = DB.Column(DB.Unicode)
     remark_lim_fs = DB.Column(DB.Unicode)
     id_sdage = DB.Column(DB.Integer, ForeignKey(TNomenclatures.id_nomenclature), nullable=False)
-    id_sage = DB.Column(DB.Integer, ForeignKey(TNomenclatures.id_nomenclature))
     remark_pres = DB.Column(DB.Unicode)
     v_habref = DB.Column(DB.Unicode)
     ef_area = DB.Column(DB.Integer)
@@ -498,6 +497,16 @@ class CorSdageSage(DB.Model):
             .join(TNomenclatures, TNomenclatures.id_nomenclature == CorSdageSage.id_sage)
             .where(CorSdageSage.id_sdage == id)
         ).all()
+
+
+class CorZhSage(DB.Model):
+    __tablename__ = "cor_zh_sage"
+    __table_args__ = {"schema": "pr_zh"}
+    id_zh = DB.Column(DB.Integer, ForeignKey(TZH.id_zh), primary_key=True)
+    id_sage = DB.Column(DB.Integer, ForeignKey(TNomenclatures.id_nomenclature), primary_key=True)
+
+    def get_sage_by_id(id):
+        return DB.session.scalars(select(CorZhSage.id_sage).where(CorZhSage.id_zh == id)).all()
 
 
 class BibCb(DB.Model):
