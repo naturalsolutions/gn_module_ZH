@@ -96,6 +96,7 @@ class Nomenclatures(TNomenclatures):
         q = select(TNomenclatures).where(
             TNomenclatures.id_type == (func.ref_nomenclatures.get_id_nomenclature_type(bib_mnemo))
         )
+        q = q.where(TNomenclatures.active.is_(True))
         if bib_mnemo == "SDAGE":
             q = q.order_by(TNomenclatures.id_nomenclature)
         return DB.session.scalars(q).all()
@@ -490,16 +491,22 @@ class CorSdageSage(DB.Model):
 
     @staticmethod
     def get_id_sdage_list():
-        q_id_sdages = DB.session.execute(select(func.distinct(CorSdageSage.id_sdage))).all()
+        q = select(func.distinct(CorSdageSage.id_sdage)).join(
+            TNomenclatures, TNomenclatures.id_nomenclature == CorSdageSage.id_sdage
+        )
+        q = q.where(TNomenclatures.active.is_(True))
+        q_id_sdages = DB.session.execute(q).all()
         return [id[0] for id in q_id_sdages]
 
     @staticmethod
     def get_sage_by_id(id):
-        return DB.session.execute(
+        q = (
             select(CorSdageSage, TNomenclatures)
             .join(TNomenclatures, TNomenclatures.id_nomenclature == CorSdageSage.id_sage)
             .where(CorSdageSage.id_sdage == id)
-        ).all()
+        )
+        q = q.where(TNomenclatures.active.is_(True))
+        return DB.session.execute(q).all()
 
 
 class BibCb(DB.Model):
